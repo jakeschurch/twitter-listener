@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import time
+import json
 from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
@@ -15,7 +16,7 @@ access_token_key = '958003558695276544-eUvZUiT2nRfiUWSZjpGGXjYJueh8Khh'
 access_token_secret = '7ter6ZZGa9W7Vr3qBqfFwFB36sUQj8g7EQ9KneNJC5IaZ'
 
 start_time = time.time()  # grabs the system time
-time_limit = 1
+time_limit = 30
 keyword_list = ['python']  # track list
 # params end
 
@@ -30,11 +31,23 @@ class listener(StreamListener):
         self.limit = time_limit
         self.tweet_data = []
 
+    def fix_data_string(self, x):   #turning JSON into dictionary (still have errors with some decoding)
+        new_data = json.loads(x)
+        return new_data
+
     def on_data(self, data):
 
         #saveFile = io.open('raw_tweets.json', 'a', encoding='utf-8')
-        print(data)
+
         while (time.time() - self.time) < self.limit:
+
+            print(data)
+            print("and")
+
+            newData = self.fix_data_string(data)
+            print(newData["text"]) #getting text of tweet to check dictionary functionality
+            print("")
+
             self.tweet_data.append(data)
             return True
 
@@ -50,6 +63,9 @@ class listener(StreamListener):
         if status_code == 420:
             #returning False in on_data disconnects the stream
             return False
+
+
+
 
 # setting up auth
 auth = OAuthHandler(ckey, consumer_secret)  # OAuth object
