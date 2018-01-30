@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 import time
 import json
-from tweepy import Stream
-from tweepy import OAuthHandler
-from tweepy.streaming import StreamListener
-import os
+import tweepy
+# import os
 '''
 TODO: func to grab tweets based off username
 TODO: func to grab tweets based off hashtag
@@ -16,14 +14,14 @@ access_token_key = '958003558695276544-eUvZUiT2nRfiUWSZjpGGXjYJueh8Khh'
 access_token_secret = '7ter6ZZGa9W7Vr3qBqfFwFB36sUQj8g7EQ9KneNJC5IaZ'
 
 start_time = time.time()  # grabs the system time
-time_limit = 30
+time_limit = 120 # in seconds (will not terminate program but will stop printing tweets)
 keyword_list = ['python']  # track list
 # params end
 
 # define listener class
 
 
-class listener(StreamListener):
+class listener(tweepy.StreamListener):
 
     def __init__(self, start_time, time_limit):
 
@@ -41,11 +39,9 @@ class listener(StreamListener):
 
         while (time.time() - self.time) < self.limit:
 
-            print(data)
-            print("and")
-
+            print(data, " and ")
             newData = self.fix_data_string(data)
-            print(newData["text"]) #getting text of tweet to check dictionary functionality
+            print(newData["text"]) # getting text of tweet to check dictionary functionality
             print("")
 
             self.tweet_data.append(data)
@@ -68,13 +64,13 @@ class listener(StreamListener):
 
 
 # setting up auth
-auth = OAuthHandler(ckey, consumer_secret)  # OAuth object
+auth = tweepy.OAuthHandler(ckey, consumer_secret)  # OAuth object
 auth.set_access_token(access_token_key, access_token_secret)
 
 if __name__ == "__main__":
     #listener._initSaveFile()
     # pass
-    twitterStream = Stream(auth, listener(
+    twitterStream = tweepy.Stream(auth, listener(
         start_time,
         time_limit))  # initialize Stream object with a time out limit
     twitterStream.filter(
