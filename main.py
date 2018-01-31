@@ -3,21 +3,11 @@ import time
 from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
-import io
+import json
 '''
 TODO: func to grab tweets based off username
-TODO: func to grab tweets based off hashtag
+TODO: Non-stream one quick pull
 '''
-# params start ---> DO NOT MODIFY KEYS!!!
-ckey = 'L5JVeOVkHIT0lE0hNHHF5ClVr'
-consumer_secret = 'rS4KyDgoz1MCRIeMVdwOqRD706S0cC5jCvxoYTsINbjWCZLl6f'
-access_token_key = '958003558695276544-eUvZUiT2nRfiUWSZjpGGXjYJueh8Khh'
-access_token_secret = '7ter6ZZGa9W7Vr3qBqfFwFB36sUQj8g7EQ9KneNJC5IaZ'
-
-start_time = time.time()  # grabs the system time
-time_limit = 30
-keyword_list = ['python']  # track list
-# params end
 
 
 class Listener(StreamListener):
@@ -25,34 +15,52 @@ class Listener(StreamListener):
 
         self.time = start_time
         self.limit = time_limit
-        self.tweet_data = []
+        self.tweet_counter = 0
 
-    def on_data(self, data, fileName='rawTweets.json'):
+    def on_data(self, data):
+        data = json.loads(data)
 
-        saveFile = io.open(fileName, 'a', encoding='utf-8')
-        saveFile.write(data + '\n')
+        global file
+        file.write('{0}\n'.format(data))
 
-        # while (time.time() - self.time) < self.limit:
-        #     self.tweet_data.append(data)
-        #     return True
-
-    def on_status(self, status):
-        print(status.text)
-
-    def on_error(self, status_code):
-        if status_code == 420:
-            # returning False in on_data disconnects the stream
-            return False
+        self.tweet_counter += 1
+        print("{0} Tweet/s Downloaded".format(self.tweet_counter))
 
 
-# setting up auth
-auth = OAuthHandler(ckey, consumer_secret)  # OAuth object
-auth.set_access_token(access_token_key, access_token_secret)
+def setup_auth(
+        ckey='L5JVeOVkHIT0lE0hNHHF5ClVr',
+        consumer_secret='rS4KyDgoz1MCRIeMVdwOqRD706S0cC5jCvxoYTsINbjWCZLl6f',
+        access_token_key='958003558695276544-eUvZUiT2nRfiUWSZjpGGXjYJueh8Khh',
+        access_token_secret='7ter6ZZGa9W7Vr3qBqfFwFB36sUQj8g7EQ9KneNJC5IaZ'):
+    auth = OAuthHandler(ckey, consumer_secret)  # OAuth object
+    auth.set_access_token(access_token_key, access_token_secret)
+
+    return auth
+
+
+def init():
+    file = open('rawJson.json', 'a')
+    return file
+
+
+def main(keyword_list: list, time_limit=30):
+    start_time = time.time()
+
+    # initialize Stream object with a time out limit
+    twitterStream = Stream(setup_auth(), Listener(start_time, time_limit))
+    twitterStream.filter(track=keyword_list, languages=['en'])
+
+
+def read_json_file(filename: str):
+    data = []
+    for line in filename:
+        data.append(json.loads(line))
+    return data
+
 
 if __name__ == "__main__":
-    twitterStream = Stream(auth, Listener(
-        start_time,
-        time_limit))  # initialize Stream object with a time out limit
-    twitterStream.filter(
-        track=keyword_list,
-        languages=['en'])  # call the filter method to run the Stream Object
+    file = init()
+    try:
+        main(['python'])
+    finally:
+        file.close()
