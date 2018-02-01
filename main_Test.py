@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import time
 import json
+import sys
 import tweepy
-# import os
+from tweepy.api import API
+from tweepy.models import Status
+import os
 '''
 TODO: func to grab tweets based off username
 TODO: func to grab tweets based off hashtag
@@ -24,28 +29,33 @@ keyword_list = ['python']  # track list
 class listener(tweepy.StreamListener):
 
     def __init__(self, start_time, time_limit):
-
+        self.api = API()
         self.time = start_time
         self.limit = time_limit
         self.tweet_data = []
+        self.tweet_counter = 0
 
-    def fix_data_string(self, x):   #turning JSON into dictionary (still have errors with some decoding)
-        new_data = json.loads(x)
-        return new_data
+
 
     def on_data(self, data):
-
-        #saveFile = io.open('raw_tweets.json', 'a', encoding='utf-8')
-
-        while (time.time() - self.time) < self.limit:
-
-            print(data, " and ")
-            newData = self.fix_data_string(data)
-            print(newData["text"]) # getting text of tweet to check dictionary functionality
-            print("")
-
-            self.tweet_data.append(data)
-            return True
+        data = json.loads(data)
+        status = Status.parse(self.api, data)
+        self.tweet_counter += 1
+        print("Number of tweets downloaded: {0}".format(self.tweet_counter))
+        sys.stdout.flush()
+        # print(status.text)
+        # print(status.name)
+        # #saveFile = io.open('raw_tweets.json', 'a', encoding='utf-8')
+        #
+        # while (time.time() - self.time) < self.limit:
+        #
+        #     print(data, " and ")
+        #     newData = self.fix_data_string(data)
+        #     print(newData["text"]) # getting text of tweet to check dictionary functionality
+        #     print("")
+        #
+        #     self.tweet_data.append(data)
+        return True
 
     def on_status(self, status):
         print(status.text)
@@ -54,6 +64,9 @@ class listener(tweepy.StreamListener):
         with open(name) as f:
             pass
         f.close()
+
+    def on_exception(self, exception):
+        return
 
     def on_error(self, status_code):
         if status_code == 420:
