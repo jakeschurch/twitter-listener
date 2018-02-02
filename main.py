@@ -77,8 +77,8 @@ def get_tweets_by_user(screen_name):
 if __name__ == "__main__":
     init()
     try:
-        # get_tweet_by_id(959393270144086016)
-        # get_tweets_by_user('realDonaldTrump')
-        # get_tweet_stream(['python'])
+        get_tweet_by_id(959393270144086016)
+        get_tweets_by_user('realDonaldTrump')
+        get_tweet_stream(['python'])
     finally:
         file.close()
