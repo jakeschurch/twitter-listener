@@ -4,10 +4,7 @@ from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
 import json
-'''
-TODO: func to grab tweets based off username
-TODO: Non-stream one quick pull
-'''
+
 
 
 class Listener(StreamListener):
