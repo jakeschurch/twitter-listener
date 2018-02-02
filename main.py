@@ -57,8 +57,41 @@ def read_json_file(filename: str):
         data.append(json.loads(line))
     return data
 
+def get_tweet_by_id(ID):
+        file = open('rawJson1.json', 'wb')
+        #authorize twitter, initialize tweepy
+        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+        auth.set_access_token(access_key, access_secret)
+        api = tweepy.API(auth)
+
+        tweet = api.get_status(ID)
+
+        print(tweet.text)
+
+def get_all_tweets(screen_name):
+    #Twitter only allows access to a users most recent 3240 tweets with this method
+    file = open('rawJson.json', 'wb')
+    #authorize twitter, initialize tweepy
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_key, access_secret)
+    api = tweepy.API(auth)
+
+    # make initial request for most recent tweets (200 is the maximum allowed count)
+    new_tweets = api.user_timeline(screen_name = screen_name,count=200)
+
+
+    for tweet in new_tweets:
+        file.write(str(tweet).encode('utf-8'))
+        # file.write('{0}\n'.format(tweet.text.encode('utf-8')))
+
+
+
 
 if __name__ == "__main__":
+    #get_all_tweets("realDonaldTrump")
+
+    #get_tweet_by_id(959393270144086016)
+
     file = init()
     try:
         main(['python'])
