@@ -33,7 +33,6 @@ def setup_auth(
         consumer_secret='rS4KyDgoz1MCRIeMVdwOqRD706S0cC5jCvxoYTsINbjWCZLl6f',
         access_token_key='958003558695276544-eUvZUiT2nRfiUWSZjpGGXjYJueh8Khh',
         access_token_secret='7ter6ZZGa9W7Vr3qBqfFwFB36sUQj8g7EQ9KneNJC5IaZ'):
-
     """ Sets up authentication for Twitter API """
     auth = OAuthHandler(ckey, consumer_secret)  # OAuth object
     auth.set_access_token(access_token_key, access_token_secret)
@@ -42,7 +41,7 @@ def setup_auth(
 
 
 def setup(jsonFile='twitterOutput.json', time_limit=30):
-    """ Initializer for __main__ function """
+    """ Setup variables for __main__ function """
     global file
     global auth
     global api
@@ -62,12 +61,12 @@ def get_tweet_stream(keywords: list):
     twitterStream.filter(track=keywords, languages=['en'])
 
 
-# def read_json_file(filename: str):
-#     """ Read in a JSON file (issues with decoding Emojis so commented out) """
-#     with open(filename, 'r') as f:
-#         for l in f:
-#             data = json.loads(l)
-#             return data
+def read_json_file(filename: str):
+    """ Read in a JSON file (issues with decoding Emojis so commented out) """
+    with open(filename, 'r') as f:
+        for l in f:
+            data = json.loads(l)
+            return data
 
 
 def get_tweet_by_id(tweet_ID):
