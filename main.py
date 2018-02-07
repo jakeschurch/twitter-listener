@@ -41,7 +41,7 @@ def setup_auth(
     return auth
 
 
-def init(jsonFile='twitterOutput.json', time_limit=30):
+def setup(jsonFile='twitterOutput.json', time_limit=30):
     """ Initializer for __main__ function """
     global file
     global auth
@@ -77,8 +77,7 @@ def get_tweet_by_id(tweet_ID):
 
 
 def get_tweets_by_user(screen_name):
-    """ Gets most recent up to 200 tweets by user """
-    # 200 is the maximum allowed count
+    """ Gets most recent up to 200 (maximum allowed by API) tweets by user """
     new_tweets = api.user_timeline(screen_name=screen_name, count=200)
 
     for tweet in new_tweets:
@@ -87,7 +86,7 @@ def get_tweets_by_user(screen_name):
 
 if __name__ == "__main__":
     """ Main Function """
-    init()
+    setup()
     try:
         # get_tweet_by_id(959393270144086016)
         # get_tweets_by_user('realDonaldTrump')
