@@ -4,7 +4,7 @@ import time
 from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
-from tweepy import API, api
+from tweepy import API
 import json
 
 
@@ -62,12 +62,12 @@ def get_tweet_stream(keywords: list):
     twitterStream.filter(track=keywords, languages=['en'])
 
 
-def read_json_file(filename: str):
-
-    with open(filename, 'r') as f:
-        for l in f:
-            data = json.loads(l)
-            return data
+# def read_json_file(filename: str):
+#     """ Read in a JSON file (issues with decoding Emojis so commented out) """
+#     with open(filename, 'r') as f:
+#         for l in f:
+#             data = json.loads(l)
+#             return data
 
 
 def get_tweet_by_id(tweet_ID):
