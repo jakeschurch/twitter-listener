@@ -62,7 +62,7 @@ def get_tweet_stream(keywords: list):
 
 
 def read_json_file(filename: str):
-    """ Read in a JSON file (issues with decoding Emojis so commented out) """
+    """ Read in a JSON file """
     with open(filename, 'r') as f:
         for l in f:
             data = json.loads(l)
