@@ -90,25 +90,6 @@ class tweet():
         self.text = text
         self.userId = userId
 
-
-def testing():
-    """
-    [Attributes]
-        created_at
-        id -> tweet
-        text
-
-    [Nested] -> user
-        id
-        screen name
-        location
-    """
-    vals = read_json('twitterOutput.json')
-
-    for val in vals:
-        for v in vals:
-            print(v)
-
 def read_json(filename: str):
     with open(filename, 'r') as f:
         for line in f:
@@ -116,24 +97,14 @@ def read_json(filename: str):
         data = [json.loads(d) for d in data]
     return data
 
-def load_json(filename: str):
-    data = read_json(filename)
-    for d in data:
-        try:
-            if d["truncated"] == "true":
-                pass
-        except KeyError:
-            print(d)
-
 
 if __name__ == "__main__":
-    init()
+    setup()
     # testing()
-    load_json('twitterOutput.json')
-    # try:
+    try:
     #     # get_tweet_by_id(959393270144086016)
     #     # get_tweets_by_user('realDonaldTrump')
-    #     get_tweet_stream(['Trump'])
-    # finally:
-    #     listener.store_data()
-    #     file.close()
+        get_tweet_stream(['Trump'])
+    finally:
+        listener.store_data()
+        file.close()
