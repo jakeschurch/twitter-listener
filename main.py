@@ -5,7 +5,9 @@ from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
 from tweepy import API
+
 import json
+import csv
 
 
 class Listener(StreamListener):
@@ -89,6 +91,20 @@ class tweet():
         self.createdAt = createdAt
         self.text = text
         self.userId = userId
+
+    def to_record(self) -> list:
+        return [self.tweetId, self.createdAt, self.text, self.userId]
+
+
+def to_csv(tweet_list: list, file_name='tweet_output.csv', delim=','):
+    with open(file_name, "a") as file:
+        csv_writer = csv.writer(file, delimiter=delim)
+
+        # write headers to file
+        csv_writer.writerow(['tweetId', 'createdAt', 'text', 'userId'])
+        for tweet_value in tweet_list:
+            csv_writer.writerow(tweet_value.__dict__.values())
+
 
 def read_json(filename: str):
     with open(filename, 'r') as f:
