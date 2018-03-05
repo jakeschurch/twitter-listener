@@ -8,6 +8,7 @@ from tweepy import API
 
 import simplejson as json
 import csv
+import keys  # python file that holds my secret key
 
 
 class Listener(StreamListener):
@@ -51,10 +52,16 @@ def get_tweet_by_id(tweet_ID, api):
 
 def get_tweets_by_user(screen_name, api, count=200):
     """ Gets most recent up to 200 (maximum allowed by API) tweets by user """
-    new_tweets = api.user_timeline(screen_name=screen_name, count=200)
 
-    for tweet in new_tweets:
-        results.extend(tweet._json)
+    new_tweets = api.user_timeline(screen_name=screen_name, count=count)
+    objs = [(x._json) for x in new_tweets]
+    results.extend(objs)
+        # results.extend(
+        #     tweet(
+        #         tweetId=item['id_str'],
+        #         createdAt=item['created_at'],
+        #         text=item['text'],
+        #         userId=item['user']['screen_name']))
 
 
 def to_csv(tweet_list: list, file_name='tweet_output.csv', delim=','):
@@ -68,19 +75,18 @@ def to_csv(tweet_list: list, file_name='tweet_output.csv', delim=','):
 
 
 def write_json(data: list, file, overwrite: str):
-    data = json.dumps(data, ensure_ascii=False, separators=(',', ': '))
-
     if overwrite is True:
         filemode = 'w'
     else:
         filemode = 'a'
     with open(file, filemode) as f:
-        f.write(data)
+        json.dump(data, f, ensure_ascii=False, separators=(',', ': '))
 
 
 def read_json(file: str):
     with open(file, 'r') as f:
-        data = json.load(f, encoding='utf8')
+        for line in f:
+            data = json.loads(line, encoding='utf8')
     return data
 
 
@@ -91,17 +97,27 @@ def get_tweet_stream(keywords: list, auth, listener: Listener):
     twitterStream.filter(track=keywords, languages=['en'])
 
 
-def setup_auth(
-        ckey='L5JVeOVkHIT0lE0hNHHF5ClVr',
-        consumer_secret='rS4KyDgoz1MCRIeMVdwOqRD706S0cC5jCvxoYTsINbjWCZLl6f',
-        access_token_key='958003558695276544-eUvZUiT2nRfiUWSZjpGGXjYJueh8Khh',
-        access_token_secret='7ter6ZZGa9W7Vr3qBqfFwFB36sUQj8g7EQ9KneNJC5IaZ'):
+def setup_auth():
     """ Sets up authentication for Twitter API """
+    ckey, consumer_secret, access_token_key, access_token_secret = keys.GetSecrets(
+    )
     auth = OAuthHandler(ckey, consumer_secret)  # OAuth object
     auth.set_access_token(access_token_key, access_token_secret)
 
     api = API(auth)
     return auth, api
+
+
+def to_tweets(jsonList):
+    tweets = []
+    for item in jsonList:
+        tweets.append(
+            tweet(
+                tweetId=item['id_str'],
+                createdAt=item['created_at'],
+                text=item['text'],
+                userId=item['user']['screen_name']))
+    return tweets
 
 
 def main(keywords: list,
@@ -128,7 +144,15 @@ def main(keywords: list,
             get_tweets_by_user(kw, api, tweetLimit)
 
     write_json(results, filename, overwrite)
+    jsonTweets = read_json(filename)
+
+    tweets = to_tweets(jsonTweets)
+    to_csv(tweets)
 
 
 if __name__ == "__main__":
-    main(['RealDonaldTrump'], 'twitterOutput.json', byUser=True)
+    main(
+        keywords=['Google'],
+        filename='twitterOutput.json',
+        byUser=True,
+        overwrite=True)
